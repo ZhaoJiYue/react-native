@@ -2,21 +2,21 @@
  * Created by wangbo on 2017/11/15.
  */
 
-import React,{Component} from 'react';
-import {View, StyleSheet, Text,FlatList,TouchableOpacity,Image,StatusBar} from 'react-native';
+import React, { Component } from 'react';
+import { View, StyleSheet, Text, FlatList, TouchableOpacity, Image, StatusBar } from 'react-native';
 import OrderRecommendCell from '../../pages/Order/OrderRecommendCell'
-import HomeMenuView from  './HomeMenuView'
+import HomeMenuView from './HomeMenuView'
 import HomeGridView from './HomeGridView'
-import {ItemSeparator,SectionSeparator} from '../../components/Common'
+import { ItemSeparator } from '../../components/Common'
 import screen from '../../common/screen'
 import color from '../../common/color'
-import {Paragraph,Heading2} from '../../components/Common'
+import { Paragraph, Heading2 } from '../../components/Common'
 import NavigationItem from '../../components/NavigationItem'
 import api from '../../utils/api'
 
-class HomePage extends Component{
+class HomePage extends Component {
 
-    static navigationOptions = ({ navigation }) => ({
+    static navigationOptions = () => ({
         headerTitle: (
             <TouchableOpacity style={styles.searchBar}>
                 <Image source={require('../../images/Home/search_icon.png')} style={styles.searchIcon} />
@@ -44,7 +44,7 @@ class HomePage extends Component{
     })
 
 
-    constructor(props: Object) {
+    constructor(props) {
         super(props)
         StatusBar.setBarStyle('light-content');
 
@@ -67,7 +67,6 @@ class HomePage extends Component{
 
     requestData() {
         this.setState({ refreshing: true })
-
         this.requestDiscount()
         this.requestRecommend()
     }
@@ -88,13 +87,31 @@ class HomePage extends Component{
                     }
                 }
             )
-
             this.setState({
                 dataList: dataList,
+                // dataList: daList,
                 refreshing: false,
             })
         } catch (error) {
-            this.setState({ refreshing: false })
+            // this.setState({ refreshing: false })
+            let daList = [{
+                id: "1",
+                imageUrl: "info.squareimgurl",
+                title: "info.mname",
+                subtitle: "`[${info.range}]${info.title}`",
+                price: "info.price"
+            }, {
+                id: "1",
+                imageUrl: "info.squareimgurl",
+                title: "info.mname",
+                subtitle: "`[${info.range}]${info.title}`",
+                price: "info.price"
+            }]
+            this.setState({
+                // dataList: dataList,
+                dataList: daList,
+                refreshing: false,
+            })
         }
     }
 
@@ -102,35 +119,61 @@ class HomePage extends Component{
         try {
             let response = await fetch(api.discount);
             let json = await response.json();
-            let discounts = json.data.map(
-                (info) => {
-                    return{
-                        id:info.id,
-                        title:info.maintitle,
-                        subtitle:info.deputytitle,
-                        color:info.deputy_typeface_color,
-                        imageUrl:info.imageurl,
-                        tplurl:info.tplurl
-                    }
-                }
-            )
-            this.setState({ discounts: discounts })
+            // let discounts = json.data.map(
+            //     (info) => {
+            //         return {
+            //             id: info.id,
+            //             title: info.maintitle,
+            //             subtitle: info.deputytitle,
+            //             color: info.deputy_typeface_color,
+            //             imageUrl: info.imageurl,
+            //             tplurl: info.tplurl
+            //         }
+            //     }
+            // )
+            let daList = [{
+                id: "1",
+                imageUrl: "info",
+                title: "mname",
+                subtitle: "title",
+            }, {
+                id: "1",
+                imageUrl: "info",
+                title: "mname",
+                subtitle: "title",
+            }]
+            // this.setState({ discounts: discounts })
+            
+            this.setState({ discounts: daList })
         } catch (error) {
-            alert(error)
+            let daList = [{
+                id: "1",
+                imageUrl: "info.squareimgurl",
+                title: "info.mname",
+                subtitle: "`[${info.range}]${info.title}`",
+                price: "info.price"
+            }, {
+                id: "1",
+                imageUrl: "info.squareimgurl",
+                title: "info.mname",
+                subtitle: "`[${info.range}]${info.title}`",
+                price: "info.price"
+            }]
+            this.setState({ discounts: daList })
+            // alert(error)
         }
     }
 
-    renderCell(info: Object) {
+    renderCell(info) {
         return (
             <OrderRecommendCell
                 info={info.item}
-                onPress={() => this.props.navigation.navigate('Detail',{info:info.item})}
+                onPress={() => this.props.navigation.navigate('Detail', { info: info.item })}
             />
         )
     }
 
-
-    keyExtractor(item: Object, index: number) {
+    keyExtractor(item) {
         return item.id
     }
 
@@ -138,11 +181,8 @@ class HomePage extends Component{
         return (
             <View>
                 <HomeMenuView menuInfos={api.menuInfo} onMenuSelected={this.onMenuSelected} />
-
-                <ItemSeparator/>
-
+                <ItemSeparator />
                 <HomeGridView infos={this.state.discounts} onGridSelected={(this.onGridSelected)} />
-
                 <View style={styles.recommendHeader}>
                     <Heading2>猜你喜欢</Heading2>
                 </View>
@@ -150,24 +190,23 @@ class HomePage extends Component{
         )
     }
 
-    onGridSelected(index: number) {
+    onGridSelected(index) {
         let discount = this.state.discounts[index]
 
         if (discount.type == 1) {
             StatusBar.setBarStyle('default', false)
-
             let location = discount.tplurl.indexOf('http')
             let url = discount.tplurl.slice(location)
             this.props.navigation.navigate('Web', { url: url })
         }
     }
 
-    onMenuSelected(index: number) {
+    onMenuSelected(index) {
         alert(index)
     }
 
-    render(){
-        return(
+    render() {
+        return (
             <View style={styles.container}>
                 <FlatList
                     ListHeaderComponent={this.renderHeader}
@@ -175,7 +214,7 @@ class HomePage extends Component{
                     onRefresh={this.requestData}
                     refreshing={this.state.refreshing}
                     renderItem={this.renderCell}
-                    ItemSeparatorComponent={() => <ItemSeparator/>}
+                    ItemSeparatorComponent={() => <ItemSeparator />}
                     keyExtractor={this.keyExtractor}
                 />
             </View>
@@ -184,8 +223,8 @@ class HomePage extends Component{
 }
 
 const styles = StyleSheet.create({
-    container:{
-        backgroundColor:"#fff",
+    container: {
+        backgroundColor: "#fff",
     },
     recommendHeader: {
         height: 35,
